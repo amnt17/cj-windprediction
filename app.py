@@ -1,7 +1,7 @@
 from flask import Flask, request, jsonify
 from joblib import load
 import streamlit as st
-import requests
+import requests 
 import json
 import threading
 
