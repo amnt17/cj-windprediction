@@ -11,7 +11,7 @@ app = Flask(__name__)
 # Fungsi untuk memuat model saat aplikasi Flask dijalankan
 def load_model():
     global model
-    model = load('windprediction_DTReg.model')
+    model = load('windprediction_DTReg.pkl')
 
 # Endpoint untuk memprediksi
 @app.route('/predict', methods=['POST'])
