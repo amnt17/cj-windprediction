@@ -1,38 +1,41 @@
 from flask import Flask, request, jsonify
 from joblib import load
 import streamlit as st
-import requests 
+import requests
 import json
 import threading
 
 # Inisialisasi aplikasi Flask
 app = Flask(__name__)
 
-# Fungsi untuk memuat model saat aplikasi Flask dijalankan
+# Fungsi untuk memuat model
 def load_model():
     global DTReg
     DTReg = load('windprediction_DTReg.pkl')
 
+# Muat model saat aplikasi dijalankan
+load_model()
+
 # Endpoint untuk memprediksi
 @app.route('/predict', methods=['POST'])
 def predict():
-    # Ambil data dari request POST
-    data = request.get_json()
-    Tavg = data['Tavg']
-    RH_avg = data['RH_avg']
-    
-    # Lakukan prediksi dengan model
-    prediction = DTReg.predict([[Tavg, RH_avg]])
-    result = {'ff_x': prediction[0]}
-    
-    return jsonify(result)
+    try:
+        # Ambil data dari request POST
+        data = request.get_json()
+        Tavg = data['Tavg']
+        RH_avg = data['RH_avg']
+        
+        # Lakukan prediksi dengan model
+        prediction = DTReg.predict([[Tavg, RH_avg]])
+        result = {'ff_x': prediction[0]}
+        
+        return jsonify(result)
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
 
 # Fungsi untuk menjalankan Flask di thread terpisah
 def run_flask():
-    app.run(host="localhost", port=5000)
-
-# Jalankan fungsi load_model di thread terpisah
-threading.Thread(target=load_model).start()
+    app.run(host="0.0.0.0", port=5000, threaded=True)
 
 # Jalankan Flask di thread terpisah
 threading.Thread(target=run_flask).start()
@@ -49,7 +52,7 @@ if st.button('Predict'):
     # Buat data untuk dikirim ke server Flask
     data = {'Tavg': Tavg, 'RH_avg': RH_avg}
     
-    # URL endpoint prediksi
+    # URL endpoint prediksi (sesuaikan URL jika dideploy)
     url = 'http://localhost:5000/predict'
     
     # Headers untuk request POST
@@ -61,6 +64,9 @@ if st.button('Predict'):
     # Handle respons dari server Flask
     if response.status_code == 200:
         result = response.json()
-        st.success(f"Prediction: {result['ff_x']}")
+        if 'ff_x' in result:
+            st.success(f"Prediction: {result['ff_x']}")
+        else:
+            st.error('Error in prediction response')
     else:
         st.error('Error in prediction')
