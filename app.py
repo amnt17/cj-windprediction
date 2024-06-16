@@ -10,8 +10,8 @@ app = Flask(__name__)
 
 # Fungsi untuk memuat model saat aplikasi Flask dijalankan
 def load_model():
-    global model
-    model = load('windprediction_DTReg.pkl')
+    global DTReg
+    DTReg = load('windprediction_DTReg.pkl')
 
 # Endpoint untuk memprediksi
 @app.route('/predict', methods=['POST'])
@@ -22,7 +22,7 @@ def predict():
     RH_avg = data['RH_avg']
     
     # Lakukan prediksi dengan model
-    prediction = model.predict([[Tavg, RH_avg]])
+    prediction = DTReg.predict([[Tavg, RH_avg]])
     result = {'ff_x': prediction[0]}
     
     return jsonify(result)
