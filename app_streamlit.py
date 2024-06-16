@@ -15,7 +15,7 @@ if st.button('Predict'):
     data = {'Tavg': Tavg, 'RH_avg': RH_avg}
     
     # URL endpoint prediksi (sesuaikan URL jika dideploy)
-    url = 'https://your-app-name.streamlit.io/predict'  # Ganti dengan URL Streamlit Sharing
+    url = 'https://wind-prediction-anemoi.streamlit.app/'  # Ganti dengan URL Streamlit Sharing
     
     # Headers untuk request POST
     headers = {'Content-Type': 'application/json'}
