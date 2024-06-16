@@ -4,6 +4,10 @@ import streamlit as st
 import requests
 import json
 import threading
+import logging
+
+# Inisialisasi logging
+logging.basicConfig(level=logging.DEBUG)
 
 # Inisialisasi aplikasi Flask
 app = Flask(__name__)
@@ -11,7 +15,12 @@ app = Flask(__name__)
 # Fungsi untuk memuat model
 def load_model():
     global DTReg
-    DTReg = load('windprediction_DTReg.pkl')
+    try:
+        DTReg = load('windprediction_DTReg.pkl')
+        logging.info("Model loaded successfully.")
+    except Exception as e:
+        logging.error("Error loading model: %s", e)
+        DTReg = None
 
 # Muat model saat aplikasi dijalankan
 load_model()
@@ -19,6 +28,9 @@ load_model()
 # Endpoint untuk memprediksi
 @app.route('/predict', methods=['POST'])
 def predict():
+    if DTReg is None:
+        return jsonify({'error': 'Model not loaded'}), 500
+
     try:
         # Ambil data dari request POST
         data = request.get_json()
@@ -31,6 +43,7 @@ def predict():
         
         return jsonify(result)
     except Exception as e:
+        logging.error("Prediction error: %s", e)
         return jsonify({'error': str(e)}), 500
 
 # Fungsi untuk menjalankan Flask di thread terpisah
