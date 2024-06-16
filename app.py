@@ -49,7 +49,7 @@ def predict():
 
 # Fungsi untuk menjalankan Flask di thread terpisah
 def run_flask():
-    app.run(host="0.0.0.0", port=5003, threaded=True)
+    app.run(host="0.0.0.0", port=80, threaded=True)
 
 # Jalankan Flask di thread terpisah
 threading.Thread(target=run_flask).start()
