@@ -1,10 +1,9 @@
+import streamlit as st
 from flask import Flask, request, jsonify
 from joblib import load
-import streamlit as st
+import logging
 import requests
 import json
-import threading
-import logging
 
 # Inisialisasi logging
 logging.basicConfig(level=logging.DEBUG)
@@ -34,6 +33,8 @@ def predict():
     try:
         # Ambil data dari request POST
         data = request.get_json()
+        logging.debug(f"Received data: {data}")
+
         Tavg = data['Tavg']
         RH_avg = data['RH_avg']
         
@@ -41,17 +42,11 @@ def predict():
         prediction = DTReg.predict([[Tavg, RH_avg]])
         result = {'ff_x': prediction[0]}
         
+        logging.debug(f"Sending result: {result}")
         return jsonify(result)
     except Exception as e:
         logging.error("Prediction error: %s", e)
         return jsonify({'error': str(e)}), 500
-
-# Fungsi untuk menjalankan Flask di thread terpisah
-def run_flask():
-    app.run(host="0.0.0.0", port=80, threaded=True)
-
-# Jalankan Flask di thread terpisah
-threading.Thread(target=run_flask).start()
 
 # Streamlit interface
 st.title('Wind Prediction')
@@ -65,21 +60,30 @@ if st.button('Predict'):
     # Buat data untuk dikirim ke server Flask
     data = {'Tavg': Tavg, 'RH_avg': RH_avg}
     
-    # URL endpoint prediksi (sesuaikan URL jika dideploy)
-    url = 'https://wind-prediction-anemoi.streamlit.app/'
+    # URL endpoint prediksi
+    url = 'https://wind-prediction-anemoi.streamlit.app/'  # Sesuaikan dengan URL server Flask
     
     # Headers untuk request POST
     headers = {'Content-Type': 'application/json'}
     
-    # Kirim request POST ke server Flask
-    response = requests.post(url, data=json.dumps(data), headers=headers)
-    
-    # Handle respons dari server Flask
-    if response.status_code == 200:
+    try:
+        # Kirim request POST ke server Flask
+        response = requests.post(url, data=json.dumps(data), headers=headers)
+        response.raise_for_status()  # Raise HTTPError for bad responses
+        
+        # Handle respons dari server Flask
         result = response.json()
         if 'ff_x' in result:
             st.success(f"Prediction: {result['ff_x']}")
         else:
             st.error('Error in prediction response')
-    else:
-        st.error('Error in prediction')
+    
+    except requests.exceptions.RequestException as e:
+        st.error(f"Error during request to Flask server: {e}")
+    except json.JSONDecodeError as e:
+        st.error(f"Error decoding JSON response from Flask server: {e}")
+    except Exception as e:
+        st.error(f"An unexpected error occurred: {e}")
+
+# Jalankan aplikasi Streamlit sebagai server Flask
+app.run(port=80)
