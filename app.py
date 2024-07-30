@@ -1,5 +1,5 @@
+from joblib import load
 import os
-import joblib
 from flask import Flask, request, jsonify
 import streamlit as st
 import requests
