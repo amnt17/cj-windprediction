@@ -66,7 +66,7 @@ if st.button('Predict'):
     data = {'Tavg': Tavg, 'RH_avg': RH_avg}
     
     # URL endpoint prediksi (sesuaikan URL jika dideploy)
-    url = 'https://wind-prediction-anemoi.streamlit.app/'
+    url = 'https://cj-wind-prediction-itsnu.streamlit.app/'
     
     # Headers untuk request POST
     headers = {'Content-Type': 'application/json'}
