@@ -18,8 +18,11 @@ def load_model():
     try:
         DTReg = load('windprediction_DTReg.pkl')
         logging.info("Model loaded successfully.")
+    except FileNotFoundError:
+        logging.error("Model file not found: windprediction_DTReg.pkl")
+        DTReg = None
     except Exception as e:
-        logging.error("Error loading model: %s", e)
+        logging.error("Error loading model: %s", e.__class__.__name__, str(e))
         DTReg = None
 
 # Muat model saat aplikasi dijalankan
@@ -29,21 +32,21 @@ load_model()
 @app.route('/predict', methods=['POST'])
 def predict():
     if DTReg is None:
-        return jsonify({'error': 'Model not loaded'}), 500
+        return jsonify({'error': 'Model not loaded. Please check the model file.'}), 500
 
     try:
         # Ambil data dari request POST
         data = request.get_json()
         Tavg = data['Tavg']
         RH_avg = data['RH_avg']
-        
+
         # Lakukan prediksi dengan model
         prediction = DTReg.predict([[Tavg, RH_avg]])
         result = {'ff_x': prediction[0]}
-        
+
         return jsonify(result)
     except Exception as e:
-        logging.error("Prediction error: %s", e)
+        logging.error("Prediction error: %s", e.__class__.__name__, str(e))
         return jsonify({'error': str(e)}), 500
 
 # Fungsi untuk menjalankan Flask di thread terpisah
