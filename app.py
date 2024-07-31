@@ -26,7 +26,7 @@ def get_api_response(url):
 
 if __name__ == "__main__":
     logging.basicConfig(level=logging.DEBUG)
-    url = "URL_YANG_DITUJU"
+    url = "https://cj-windprediction-itsnu.streamlit.app/"
     result = get_api_response(url)
     if result is not None:
         print("API response:", result)
