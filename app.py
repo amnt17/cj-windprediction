@@ -6,6 +6,21 @@ import json
 import threading
 import logging
 
+import sklearn
+
+def load_model():
+    try:
+        DTReg = load('windprediction_DTReg.pkl')
+    except Exception as e:
+        logging.error("Error loading model: %s: %s", e.__class__.__name__, str(e))
+        raise
+
+if __name__ == "__main__":
+    logging.basicConfig(level=logging.DEBUG)
+    load_model()
+    print(f"Scikit-learn version: {sklearn.__version__}")
+
+
 # Inisialisasi logging
 logging.basicConfig(level=logging.DEBUG)
 
