@@ -57,7 +57,7 @@ def run_flask():
 threading.Thread(target=run_flask).start()
 
 # Streamlit interface
-st.title('Wind Prediction')
+st.title('Wind Velocity Prediction')
 
 # Input dari pengguna untuk temperatur dan kelembaban relatif rata-rata
 Tavg = st.number_input('Average Temperature (Tavg)')
