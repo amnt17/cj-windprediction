@@ -4,10 +4,35 @@ import streamlit as st
 import requests
 import json
 import threading
+import requests
 import logging
 
-# Inisialisasi logging
-logging.basicConfig(level=logging.DEBUG)
+def get_api_response(url):
+    response = requests.get(url)
+    logging.debug(f"Response status code: {response.status_code}")
+    logging.debug(f"Response content: {response.text}")
+
+    if response.status_code == 200:
+        try:
+            result = response.json()
+            return result
+        except requests.exceptions.JSONDecodeError as e:
+            logging.error("Error decoding JSON: %s", e)
+            logging.error("Response content: %s", response.text)
+            return None
+    else:
+        logging.error(f"HTTP error: {response.status_code}")
+        return None
+
+if __name__ == "__main__":
+    logging.basicConfig(level=logging.DEBUG)
+    url = "URL_YANG_DITUJU"
+    result = get_api_response(url)
+    if result is not None:
+        print("API response:", result)
+    else:
+        print("Failed to get a valid response")
+
 
 # Inisialisasi aplikasi Flask
 app = Flask(__name__)
