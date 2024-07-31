@@ -4,35 +4,7 @@ import streamlit as st
 import requests
 import json
 import threading
-import requests
 import logging
-
-def get_api_response(url):
-    response = requests.get(url)
-    logging.debug(f"Response status code: {response.status_code}")
-    logging.debug(f"Response content: {response.text}")
-
-    if response.status_code == 200:
-        try:
-            result = response.json()
-            return result
-        except requests.exceptions.JSONDecodeError as e:
-            logging.error("Error decoding JSON: %s", e)
-            logging.error("Response content: %s", response.text)
-            return None
-    else:
-        logging.error(f"HTTP error: {response.status_code}")
-        return None
-
-if __name__ == "__main__":
-    logging.basicConfig(level=logging.DEBUG)
-    url = "https://cj-windprediction-itsnu.streamlit.app/"
-    result = get_api_response(url)
-    if result is not None:
-        print("API response:", result)
-    else:
-        print("Failed to get a valid response")
-
 
 # Inisialisasi aplikasi Flask
 app = Flask(__name__)
@@ -47,7 +19,7 @@ def load_model():
         logging.error("Model file not found: windprediction_DTReg.pkl")
         DTReg = None
     except Exception as e:
-        logging.error("Error loading model: %s", e.__class__.__name__, str(e))
+        logging.error("Error loading model: %s: %s", e.__class__.__name__, str(e))
         DTReg = None
 
 # Muat model saat aplikasi dijalankan
@@ -71,12 +43,12 @@ def predict():
 
         return jsonify(result)
     except Exception as e:
-        logging.error("Prediction error: %s", e.__class__.__name__, str(e))
+        logging.error("Prediction error: %s: %s", e.__class__.__name__, str(e))
         return jsonify({'error': str(e)}), 500
 
 # Fungsi untuk menjalankan Flask di thread terpisah
 def run_flask():
-    app.run(host="0.0.0.0", port=80, threaded=True)
+    app.run(host="0.0.0.0", port=5000, threaded=True)
 
 # Jalankan Flask di thread terpisah
 threading.Thread(target=run_flask).start()
@@ -94,7 +66,7 @@ if st.button('Predict'):
     data = {'Tavg': Tavg, 'RH_avg': RH_avg}
     
     # URL endpoint prediksi (sesuaikan URL jika dideploy)
-    url = 'https://cj-windprediction-itsnu.streamlit.app/'
+    url = 'https://cj-windprediction-itsnu.streamlit.app/'  # Pastikan URL ini sesuai dengan tempat server Flask Anda berjalan
     
     # Headers untuk request POST
     headers = {'Content-Type': 'application/json'}
