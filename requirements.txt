@@ -4,3 +4,8 @@ scikit-learn
 pandas
 numpy
 matplotlib
+requests
+json
+threading
+logging
+jsonify
